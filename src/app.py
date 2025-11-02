@@ -2,6 +2,7 @@ import streamlit as st
 from agent import ShoppingAgent
 from config import Config
 import logging
+import os
 
 logging.basicConfig(
     filename="app.log",
@@ -46,15 +47,40 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Initialize session state
 if 'agent' not in st.session_state:
-    if not Config.GOOGLE_API_KEY:
-        st.error("⚠️ Please set your GOOGLE_API_KEY in .env file")
+    # Try to get API key from Streamlit secrets first, then fall back to Config
+    try:
+        api_key = st.secrets.get("GOOGLE_API_KEY", None)
+        if not api_key:
+            api_key = Config.GOOGLE_API_KEY
+    except Exception as e:
+        logger.warning(f"Could not access Streamlit secrets: {e}")
+        api_key = Config.GOOGLE_API_KEY
+    
+    if not api_key:
+        st.error("⚠️ Please set your GOOGLE_API_KEY")
         st.stop()
+    
+    # Override config with Streamlit secret if available
+    if api_key:
+        os.environ["GOOGLE_API_KEY"] = api_key
+        Config.GOOGLE_API_KEY = api_key
+    
     st.session_state.agent = ShoppingAgent()
+    logger.info("ShoppingAgent initialized successfully.")
 
 if 'messages' not in st.session_state:
     st.session_state.messages = []
+
+# # Initialize session state
+# if 'agent' not in st.session_state:
+#     if not Config.GOOGLE_API_KEY:
+#         st.error("⚠️ Please set your GOOGLE_API_KEY in .env file")
+#         st.stop()
+#     st.session_state.agent = ShoppingAgent()
+
+# if 'messages' not in st.session_state:
+#     st.session_state.messages = []
 
 # Header
 st.title("📱 Mobile Shopping Assistant")
