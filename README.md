@@ -2,7 +2,6 @@
 
 An intelligent shopping assistant that helps customers discover, compare, and buy mobile phones using natural language queries. Built with Python, Streamlit, and Google's Gemini AI.
 
-🔗 **[Live Demo](#)** | 📹 **[Demo Video](#)**
 
 ---
 
