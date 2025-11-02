@@ -147,13 +147,12 @@ if 'current_query' in st.session_state:
     
     # Get response
     with st.spinner("Thinking..."):
-        response, phones = st.session_state.agent.chat(query)
+        response= st.session_state.agent.chat(query)
     
     # Add assistant message
     st.session_state.messages.append({
         "role": "assistant",
         "content": response,
-        "phones": phones
     })
     
     st.rerun()
